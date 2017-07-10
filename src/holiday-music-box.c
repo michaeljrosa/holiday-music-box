@@ -111,7 +111,7 @@ int main(void)
       rest(duration[whichNote]);
     }
     
-    if(whichNote < SONG_LENGTH - 1 && song[whichNote + 1] == T) 
+    if(whichNote < SONG_LENGTH - 1 && song[whichNote + 1] == R) 
       whichNote++;
     else
       rest(1000);
