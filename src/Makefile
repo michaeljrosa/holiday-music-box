@@ -2,15 +2,10 @@
 ##########              Project-specific Details                ##########
 ##########    Check these every time you start a new project    ##########
 ##########------------------------------------------------------##########
-MCU   = attiny85
+MCU   = atmega328p
 F_CPU = 1000000UL
 BAUD  = 9600UL
 ## Also try BAUD = 19200 or 38400 if you're feeling lucky.
-
-## A directory for common include files and the simple USART library.
-## If you move either the current folder or the Library folder, you'll 
-##  need to change this path to match.
-#LIBDIR = F:\Projects\AVR\Make-AVR\AVR-Programming-master\AVR-Programming-Library
 
 ##########------------------------------------------------------##########
 ##########                 Programmer Defaults                  ##########
@@ -48,14 +43,14 @@ TARGET = holiday-music-box
 # TARGET = $(lastword $(subst /, ,$(CURDIR)))
 
 # Object files: will find all .c/.h files in current directory
-#  and in LIBDIR.  If you have any other (sub-)directories with code,
+#  If you have any other (sub-)directories with code,
 #  you can add them in to SOURCES below in the wildcard statement.
-SOURCES=$(wildcard *.c $(LIBDIR)/*.c)
+SOURCES=$(wildcard *.c)
 OBJECTS=$(SOURCES:.c=.o)
 HEADERS=$(SOURCES:.c=.h)
 
 ## Compilation options, type man avr-gcc if you're curious.
-CPPFLAGS = -DF_CPU=$(F_CPU) -DBAUD=$(BAUD) -I. -I$(LIBDIR)
+CPPFLAGS = -DF_CPU=$(F_CPU) -DBAUD=$(BAUD) 
 CFLAGS = -Os -g -std=gnu99 -Wall
 ## Use short (8-bit) data types 
 CFLAGS += -funsigned-char -funsigned-bitfields -fpack-struct -fshort-enums 
@@ -136,6 +131,13 @@ flash_eeprom: $(TARGET).eeprom
 avrdude_terminal:
 	$(AVRDUDE) -c $(PROGRAMMER_TYPE) -p $(MCU) $(PROGRAMMER_ARGS) -nt
 
+## Targets for cross-platform development
+flash_windows: PROGRAMMER_ARGS = -b 19200 -P com3
+flash_windows: flash
+
+flash_linux: PROGRAMMER_ARGS = -b 19200 -P /dev/ttyACM0
+flash_linux: flash
+
 ## If you've got multiple programmers that you use, 
 ## you can define them here so that it's easy to switch.
 ## To invoke, use something like `make flash_arduinoISP`
@@ -192,3 +194,4 @@ set_eeprom_save_fuse: fuses
 ## Clear the EESAVE fuse byte
 clear_eeprom_save_fuse: FUSE_STRING = -U hfuse:w:$(HFUSE):m
 clear_eeprom_save_fuse: fuses
+
